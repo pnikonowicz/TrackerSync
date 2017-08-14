@@ -22,34 +22,99 @@ function getDescription(data_fromGetStory) {
 	return data_fromGetStory.description
 }
 
+//////////
+
+function main() {
+	var listener = createXhrListenerFor('commands', syncOwner)
+  
+	$(document).ajaxComplete(listener)
+}
+
+function syncOwner(url, dataToSync) {
+	throw "syncOwner"
+}
+
+function listenForXhrEvent(name, action) {
+	throw "listenForXhrEvent"
+}
+
+function createXhrListenerFor(restfulAction, handlerFunction) {
+	throw "createXhrListenerFor"
+}
+
 //test framework
+function write(innerHtml) {
+	document.body.innerHTML += innerHtml
+}
+
+function br(innerHtml) {
+	return "<br>" + innerHtml + "</br>"
+}
+
+function div() {
+	innerHtml = Array.from(arguments).join(' ')
+	return "<div>" + innerHtml + "</div>"
+}
+
+function test(description, testFunction) {
+	var result = "test result - NULL"
+  
+  try {result = testFunction() }
+  catch (err) {result = fail(err)}
+  
+	write(div(description, result))
+}
+
 function pass() {
-	document.body.innerHTML += "<br>pass</br>"
+	return "<span style='background-color: lightgreen'> pass</span>"
 }
 
 function fail(x) {
-	document.body.innerHTML += "<br>fail: "+x+"</br>"
+	return "<span style='background-color: lightcoral'>fail: "+x+"</span>"
 }
 
 function assertIsNotNull(x) {
+	var html = "assertIsNotNull - FAIL"
 	if(x==null)
-  	fail('was null')
+  	return fail('was null')
   else
-  	pass()
+  	return pass()
 }
 
 function assertEqual(a,b) {
+	var html = "assertEqual - FAIL"
 	if(a==b)
-  	pass()
+  	return pass()
   else
-  	fail('expected: ' + a + ' but was: ' + b)
+  	return fail('expected: ' + a + ' but was: ' + b)
 }
 
 //tests
-assertIsNotNull(getProjectId(data))
-assertIsNotNull(getStoryId(data))
-assertIsNotNull(getStoryOwners(data))
-assertEqual('/services/v5/projects/a/stories/b', getStoryUrl('a','b'))
-assertEqual('description', getDescription(data_fromGetStory))
+test("getProjectId", 	function() {
+	return assertIsNotNull(getProjectId(data)) 
+})
 
+test("getStoryId", function() {
+	return assertIsNotNull(getStoryId(data))
+})
 
+test("getStoryOwners", function() {
+	return assertIsNotNull(getStoryOwners(data))
+})
+ 
+test("getStoryUrl", function() {
+	return assertEqual('/services/v5/projects/a/stories/b', getStoryUrl('a','b'))
+})
+
+test("getDescription", function() {
+	return assertEqual('description', getDescription(data_fromGetStory))
+})
+
+test("createXhrListenerFor - ignores non relevant actions", function() {
+	var xhrData = {"url": "/services/v5/commands?envelope=true", "data": null}
+	var result = "not called"
+	var handlerFunction = function() {result = "called"}
+	var xhrListener = createXhrListenerFor("junk", handlerFunction)
+  
+  return assertEqual("not called", result)
+})

@@ -38,8 +38,20 @@ function listenForXhrEvent(name, action) {
 	throw "listenForXhrEvent"
 }
 
-function createXhrListenerFor(restfulAction, handlerFunction) {
-	throw "createXhrListenerFor"
+function getRestfulActionFromUrl(url) {
+  // /services/v5/commands?envelope=true
+	var regex = /\/(.+)\/(.+)\/(.+)\?(.*)/
+  var match = url.match(regex)
+  return match[3]
+}
+
+function createXhrListenerFor(targetRestfulActionString, handlerFunction) {
+	return function(a,b,data) {
+  	var action = getRestfulActionFromUrl(data.url)
+    if(action === targetRestfulActionString) {
+    	handlerFunction(data)
+    }	
+  }	
 }
 
 //test framework
@@ -51,9 +63,19 @@ function br(innerHtml) {
 	return "<br>" + innerHtml + "</br>"
 }
 
+function h1(innerHtml) {
+	return "<strong style='padding-left: 12pt'>" + innerHtml + "</strong>"
+}
+
 function div() {
 	innerHtml = Array.from(arguments).join(' ')
 	return "<div>" + innerHtml + "</div>"
+}
+
+function describe(description, testFunction) {
+	var html = h1(description)
+  write(html)
+  testFunction()
 }
 
 function test(description, testFunction) {
@@ -90,31 +112,58 @@ function assertEqual(a,b) {
 }
 
 //tests
-test("getProjectId", 	function() {
-	return assertIsNotNull(getProjectId(data)) 
-})
+describe("", function() {
+  test("getProjectId", 	function() {
+    return assertIsNotNull(getProjectId(data)) 
+  })
 
-test("getStoryId", function() {
-	return assertIsNotNull(getStoryId(data))
-})
+  test("getStoryId", function() {
+    return assertIsNotNull(getStoryId(data))
+  })
 
-test("getStoryOwners", function() {
-	return assertIsNotNull(getStoryOwners(data))
-})
- 
-test("getStoryUrl", function() {
-	return assertEqual('/services/v5/projects/a/stories/b', getStoryUrl('a','b'))
-})
+  test("getStoryOwners", function() {
+    return assertIsNotNull(getStoryOwners(data))
+  })
 
-test("getDescription", function() {
-	return assertEqual('description', getDescription(data_fromGetStory))
-})
+  test("getStoryUrl", function() {
+    return assertEqual('/services/v5/projects/a/stories/b', getStoryUrl('a','b'))
+  })
 
-test("createXhrListenerFor - ignores non relevant actions", function() {
-	var xhrData = {"url": "/services/v5/commands?envelope=true", "data": null}
-	var result = "not called"
-	var handlerFunction = function() {result = "called"}
-	var xhrListener = createXhrListenerFor("junk", handlerFunction)
+  test("getDescription", function() {
+    return assertEqual('description', getDescription(data_fromGetStory))
+  })
   
-  return assertEqual("not called", result)
+  test("getRestfulActionFromUrl", function() {
+    var url = "/services/v5/commands?envelope=true"
+
+    var result = getRestfulActionFromUrl(url)
+
+    return assertEqual("commands", result)
+  })
 })
+
+describe("createXhrListenerFor", function() {
+	test("ignores non relevant actions", function() {
+    var xhrData = {"url": "/services/v5/commands?envelope=true", "data": null}
+    var result = "not called"
+    var handlerFunction = function() {result = "called"}
+    var xhrListener = createXhrListenerFor("junk", handlerFunction)
+
+    xhrListener(null, null, xhrData)
+
+    return assertEqual("not called", result)
+  })
+
+  test("executes action when relevant", function() {
+    var xhrData = {"url": "/services/v5/commands?envelope=true", "data": null}
+    var result = "not called"
+    var handlerFunction = function() {result = "called"}
+    var xhrListener = createXhrListenerFor("commands", handlerFunction)
+
+    xhrListener(null, null, xhrData)
+
+    return assertEqual("called", result)
+  })
+});
+
+

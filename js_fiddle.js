@@ -8,7 +8,8 @@ function syncOwner(data) {
 	xhrGetDescription(data, function() {
   	var description = getDescription(data)
     if(doesDescriptionLinkToAnotherStory(description)) {
-      var setOwnerUrl = createSetOwnerUrl(data)
+    	var descriptionLinkStoryId = getDescriptionLinkStoryId(description)
+      var setOwnerUrl = createSetOwnerUrl(data, descriptionLinkStoryId)
       xhrSetOwner(setOwnerUrl, function(data) {
       	console.log("owner updated:", data)
       }) 
@@ -18,7 +19,12 @@ function syncOwner(data) {
   })
 }
 
+function getDescriptionLinkStoryId() {
+	throw "getDescriptionLinkStoryId"
+}
+
 function createSetOwnerUrl() {
+//https://www.pivotaltracker.com/services/v5/projects/$PROJECT_ID/stories/567
 	throw "createSetOwnerUrl"
 }
 
@@ -188,6 +194,27 @@ describe("doesDescriptionLinkToAnotherStory", function() {
       var result = doesDescriptionLinkToAnotherStory(description)
       
       return assertFalse(result)
+  })
+})
+
+describe("createSetOwnerUrl", function() {
+	test("", function() {
+  	var data = {"person_id":2854507,"project":{"id":2025095,"version":2685},"command":{"type":"story_update","command_uuid":"acf13aa0-9b61-45df-a788-52d4a1ca3c01","parameters":{"owner_ids":[2179671,2854507],"id":150219631}}}
+  	
+    var descriptionLinkStoryId = 1
+    var result = createSetOwnerUrl(data, descriptionLinkStoryId)
+    var expected = "/services/v5/projects/2025095/stories/" + descriptionLinkStoryId
+    return assertEqual(expected, result)
+	})
+})
+
+describe("getDescriptionLinkStoryId", function() {
+	test("", function() {
+  	var description = "#134"
+    
+    var result = getDescriptionLinkStoryId(description)
+    
+    return assertEqual("134", result)
   })
 })
 

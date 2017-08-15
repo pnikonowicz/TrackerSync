@@ -44,10 +44,6 @@ function xhrSetOwner() {
 	throw "xhrSetOwner"
 }
 
-function listenForXhrEvent(name, action) {
-	throw "listenForXhrEvent"
-}
-
 function getRestfulActionFromUrl(url) {
   // /services/v5/commands?envelope=true
 	var regex = /\/(.+)\/(.+)\/(.+)\?(.*)/

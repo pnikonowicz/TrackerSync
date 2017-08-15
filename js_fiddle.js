@@ -1,21 +1,3 @@
-
-
-
-
-function getDescription(data_fromGetStory) {
-	return data_fromGetStory.description
-}
-
-function xhrGetDescription(data, asyncFunction) {
-	var projectId = getTargetProjectId()
-  var storyId = data.command.parameters.id
-	var url = getStoryUrl(projectId)
-	
-  jQuery.get(url, asyncFunction)
-}
-
-//////////
-
 function main() {
 	var listener = createXhrListenerFor('commands', syncOwner)
   
@@ -34,6 +16,18 @@ function syncOwner(data) {
       //do nothing
     }
   })
+}
+
+function getDescription(data_fromGetStory) {
+	return data_fromGetStory.description
+}
+
+function xhrGetDescription(data, asyncFunction) {
+	var projectId = getTargetProjectId()
+  var storyId = data.command.parameters.id
+	var url = getStoryUrl(projectId)
+	
+  jQuery.get(url, asyncFunction)
 }
 
 function doesDescriptionLinkToAnotherStory(description) {

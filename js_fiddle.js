@@ -18,6 +18,14 @@ function syncOwner(data) {
   })
 }
 
+function createSetOwnerUrl() {
+	throw "createSetOwnerUrl"
+}
+
+function xhrSetOwner() {
+	throw "xhrSetOwner"
+}
+
 function getDescription(data_fromGetStory) {
 	return data_fromGetStory.description
 }
@@ -34,14 +42,6 @@ function doesDescriptionLinkToAnotherStory(description) {
 	var trimmed = description.trim()
   var regex = /#\d+/
   return description.match(regex) != null
-}
-
-function createSetOwnerUrl() {
-	throw "createSetOwnerUrl"
-}
-
-function xhrSetOwner() {
-	throw "xhrSetOwner"
 }
 
 function getRestfulActionFromUrl(url) {

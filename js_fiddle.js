@@ -22,6 +22,18 @@ function getDescription(data_fromGetStory) {
 	return data_fromGetStory.description
 }
 
+function getTargetProjectId() {
+	return "2025095"
+}
+
+function xhrGetDescription(data, asyncFunction) {
+	var projectId = getTargetProjectId()
+  var storyId = data.command.parameters.id
+	var url = getStoryUrl(projectId)
+	
+  jQuery.get(url, asyncFunction)
+}
+
 //////////
 
 function main() {
@@ -30,8 +42,32 @@ function main() {
 	$(document).ajaxComplete(listener)
 }
 
-function syncOwner(url, dataToSync) {
-	throw "syncOwner"
+function syncOwner(data) {
+	xhrGetDescription(data, function() {
+  	var description = getDescription(data)
+    if(doesDescriptionLinkToAnotherStory(description)) {
+      var setOwnerUrl = createSetOwnerUrl(data)
+      xhrSetOwner(setOwnerUrl, function(data) {
+      	console.log("owner updated:", data)
+      }) 
+    } else {
+      //do nothing
+    }
+  })
+}
+
+function doesDescriptionLinkToAnotherStory(description) {
+	var trimmed = description.trim()
+  var regex = /#\d+/
+  return description.match(regex) != null
+}
+
+function createSetOwnerUrl() {
+	throw "createSetOwnerUrl"
+}
+
+function xhrSetOwner() {
+	throw "xhrSetOwner"
 }
 
 function listenForXhrEvent(name, action) {
@@ -73,7 +109,7 @@ function div() {
 }
 
 function describe(description, testFunction) {
-	var html = h1(description)
+	var html = br(h1(description))
   write(html)
   testFunction()
 }
@@ -111,6 +147,14 @@ function assertEqual(a,b) {
   	return fail('expected: ' + a + ' but was: ' + b)
 }
 
+function assertTrue(a) {
+	return assertEqual(a, true)
+}
+
+function assertFalse(a) {
+	return assertEqual(a, false)
+}
+
 //tests
 describe("", function() {
   test("getProjectId", 	function() {
@@ -140,6 +184,8 @@ describe("", function() {
 
     return assertEqual("commands", result)
   })
+  
+  
 })
 
 describe("createXhrListenerFor", function() {
@@ -165,5 +211,29 @@ describe("createXhrListenerFor", function() {
     return assertEqual("called", result)
   })
 });
+
+describe("doesDescriptionLinkToAnotherStory", function() {
+  test("return true if the description only contains a link", function() {
+      var description = "#150133717"
+      var result = doesDescriptionLinkToAnotherStory(description)
+      
+      return assertTrue(result)
+  })
+  
+  test("return true if the description links with extra whitespace", function() {
+      var description = "  #150133717  "
+      var result = doesDescriptionLinkToAnotherStory(description)
+      
+      return assertTrue(result)
+  })
+  
+  test("return false if the description does not only contain a link", function() {
+      var description = "something else"
+      var result = doesDescriptionLinkToAnotherStory(description)
+      
+      return assertFalse(result)
+  })
+})
+
 
 

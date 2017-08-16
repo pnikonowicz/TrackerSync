@@ -9,8 +9,8 @@ function syncOwner(data) {
   	var description = getDescription(data)
     if(doesDescriptionLinkToAnotherStory(description)) {
     	var descriptionLinkStoryId = getDescriptionLinkStoryId(description)
-      var setOwnerUrl = createSetOwnerUrl(data, descriptionLinkStoryId)
-      xhrSetOwner(setOwnerUrl, function(data) {
+      var setOwnerData = createSetOwnerData(data)
+      xhrSetOwner(descriptionLinkStoryId, setOwnerData, function(data) {
       	console.log("owner updated:", data)
       }) 
     } else {
@@ -19,17 +19,26 @@ function syncOwner(data) {
   })
 }
 
-function getDescriptionLinkStoryId() {
-	throw "getDescriptionLinkStoryId"
+function getDescriptionLinkStoryId(descriptionLink) {
+	//remove preceding # from link
+	return descriptionLink.trim().substring(1)
 }
 
-function createSetOwnerUrl() {
-//https://www.pivotaltracker.com/services/v5/projects/$PROJECT_ID/stories/567
-	throw "createSetOwnerUrl"
+function createSetOwnerData(data) {
+  	return data.command.parameters
 }
 
-function xhrSetOwner() {
-	throw "xhrSetOwner"
+function xhrSetOwner(storyId, data, callback) {
+	var projectId = getTargetProjectId()
+	var url = getStoryUrl(projectId, storyId)
+	$.ajax({
+    	type:"PUT", 
+     	url:url, 
+      data: JSON.stringify(data), 
+      contentType:"application/json; charset=utf-8", 
+      dataType:"json",
+      success: callback
+  })
 }
 
 function getDescription(data_fromGetStory) {
@@ -39,9 +48,13 @@ function getDescription(data_fromGetStory) {
 function xhrGetDescription(data, asyncFunction) {
 	var projectId = getTargetProjectId()
   var storyId = data.command.parameters.id
-	var url = getStoryUrl(projectId)
+	var url = getStoryUrl(projectId, storyId)
 	
   jQuery.get(url, asyncFunction)
+}
+
+function getTargetProjectId() {
+	return "2025095"
 }
 
 function doesDescriptionLinkToAnotherStory(description) {
@@ -81,7 +94,9 @@ function createXhrListenerFor(targetRestfulActionString, targetCommandTypeString
   }	
 }
 
+////////////////////////////////
 //test framework
+////////////////////////////////
 function write(innerHtml) {
 	document.body.innerHTML += innerHtml
 }
@@ -128,6 +143,10 @@ function assertIsNotNull(x) {
   	return fail('was null')
   else
   	return pass()
+}
+
+function getStoryUrl(projectId, storyId) {
+	return '/services/v5/projects/'+ projectId + '/stories/' + storyId
 }
 
 function assertEqual(a,b) {
@@ -263,20 +282,26 @@ describe("getCommandType", function() {
   })
 })
 
-describe("createSetOwnerUrl", function() {
-	test("", function() {
+describe("createSetOwnerData", function() {
+	test("grabs the data", function() {
   	var data = {"person_id":2854507,"project":{"id":2025095,"version":2685},"command":{"type":"story_update","command_uuid":"acf13aa0-9b61-45df-a788-52d4a1ca3c01","parameters":{"owner_ids":[2179671,2854507],"id":150219631}}}
   	
-    var descriptionLinkStoryId = 1
-    var result = createSetOwnerUrl(data, descriptionLinkStoryId)
-    var expected = "/services/v5/projects/2025095/stories/" + descriptionLinkStoryId
-    return assertEqual(expected, result)
+    var result = createSetOwnerData(data)
+    var expected = {"owner_ids":[2179671,2854507],"id":150219631}
+    return assertEqual(JSON.stringify(expected), JSON.stringify(result))
 	})
 })
 
 describe("getDescriptionLinkStoryId", function() {
-	test("", function() {
+	test("works perfectly", function() {
   	var description = "#134"
+    
+    var result = getDescriptionLinkStoryId(description)
+    
+    return assertEqual("134", result)
+  })
+  test("works with whitespace", function() {
+  	var description = "  #134   "
     
     var result = getDescriptionLinkStoryId(description)
     

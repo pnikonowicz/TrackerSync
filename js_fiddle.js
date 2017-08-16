@@ -72,10 +72,12 @@ function getCommandType(data) {
 function createXhrListenerFor(targetRestfulActionString, targetCommandTypeString, handlerFunction) {
 	return function(a,b,data) {
   	var action = getRestfulActionFromUrl(data.url)
-    var commandType = getCommandType(data)
+    var commandType = getCommandType(data.data)
     if(action === targetRestfulActionString && commandType == targetCommandTypeString) {
     	handlerFunction(data)
-    }	
+    }	else {
+    	console.log("ignoring:", "commandType", commandType, "action", action)
+    }
   }	
 }
 

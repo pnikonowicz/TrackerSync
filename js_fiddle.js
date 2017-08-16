@@ -1,5 +1,5 @@
 function main() {
-	var listener = createXhrListenerFor('commands', syncOwner)
+	var listener = createXhrListenerFor('commands', 'story_update', syncOwner)
   
 	$(document).ajaxComplete(listener)
 }
@@ -59,10 +59,20 @@ function getRestfulActionFromUrl(url) {
   	return 'dont care'
 }
 
+function getCommandType(data) {
+	if (data == null)
+  	return "DATA MISSING"
+   if (data.command == null)
+   	return "DATA.COMMAND IS MISSING"
+   if (data.command.type == null)
+   	return "DATA.COMMAND.TYPE IS MISSING"
+  return data.command.type
+}
+
 function createXhrListenerFor(targetRestfulActionString, targetCommandTypeString, handlerFunction) {
 	return function(a,b,data) {
   	var action = getRestfulActionFromUrl(data.url)
-    var commandType = data.data.command.type
+    var commandType = getCommandType(data)
     if(action === targetRestfulActionString && commandType == targetCommandTypeString) {
     	handlerFunction(data)
     }	
@@ -218,6 +228,36 @@ describe("doesDescriptionLinkToAnotherStory", function() {
       var result = doesDescriptionLinkToAnotherStory(description)
       
       return assertFalse(result)
+  })
+})
+
+describe("getCommandType", function() {
+	test("return command type", function() {
+  	var data = {"command":{"type":"story_update",}}
+  	var result = getCommandType(data)
+    
+    return assertEqual("story_update", result)
+  })
+  
+  test("if data is missing", function() {
+  	var data = null
+  	var result = getCommandType(data)
+    
+    return assertEqual("DATA MISSING", result)
+  })
+  
+  test("if command is missing", function() {
+  	var data = {}
+  	var result = getCommandType(data)
+    
+    return assertEqual("DATA.COMMAND IS MISSING", result)
+  })
+  
+  test("if type is missing", function() {
+  	var data = {"command": {}}
+  	var result = getCommandType(data)
+    
+    return assertEqual("DATA.COMMAND.TYPE IS MISSING", result)
   })
 })
 

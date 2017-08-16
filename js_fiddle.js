@@ -54,7 +54,7 @@ function xhrGetDescription(data, asyncFunction) {
 }
 
 function getTargetProjectId() {
-	return "2025095"
+	return "1479998"
 }
 
 function doesDescriptionLinkToAnotherStory(description) {

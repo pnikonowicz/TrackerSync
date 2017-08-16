@@ -52,15 +52,18 @@ function doesDescriptionLinkToAnotherStory(description) {
 
 function getRestfulActionFromUrl(url) {
   // /services/v5/commands?envelope=true
-	var regex = /\/(.+)\/(.+)\/(.+)\?(.*)/
-  var match = url.match(regex)
-  return match[3]
+  // /services/v5/aggregateor
+  if(url == '/services/v5/commands?envelope=true')
+  	return 'commands'
+  else
+  	return 'dont care'
 }
 
-function createXhrListenerFor(targetRestfulActionString, handlerFunction) {
+function createXhrListenerFor(targetRestfulActionString, targetCommandTypeString, handlerFunction) {
 	return function(a,b,data) {
   	var action = getRestfulActionFromUrl(data.url)
-    if(action === targetRestfulActionString) {
+    var commandType = data.data.command.type
+    if(action === targetRestfulActionString && commandType == targetCommandTypeString) {
     	handlerFunction(data)
     }	
   }	
@@ -138,8 +141,10 @@ describe("", function() {
     
     return assertEqual('description', getDescription(data_fromGetStory))
   })
-  
-  test("getRestfulActionFromUrl", function() {
+})
+
+describe("getRestfulActionFromUrl", function() {
+	test("handles command url", function() {
     var url = "/services/v5/commands?envelope=true"
 
     var result = getRestfulActionFromUrl(url)
@@ -147,15 +152,33 @@ describe("", function() {
     return assertEqual("commands", result)
   })
   
-  
+  test("handles aggregate url", function() {
+    var url = "/services/v5/aggregator"
+
+    var result = getRestfulActionFromUrl(url)
+
+    return assertEqual("dont care", result)
+  })
 })
 
 describe("createXhrListenerFor", function() {
 	test("ignores non relevant actions", function() {
-    var xhrData = {"url": "/services/v5/commands?envelope=true", "data": null}
+  	var xhrData = {"url": "/services/v5/aggregateor"}
     var result = "not called"
     var handlerFunction = function() {result = "called"}
-    var xhrListener = createXhrListenerFor("junk", handlerFunction)
+    var xhrListener = createXhrListenerFor("commands", "story_update", handlerFunction)
+
+    xhrListener(null, null, xhrData)
+
+    return assertEqual("not called", result)
+  })
+  
+  test("ignores non relevant command types", function() {
+  	var commandData = {"command":{"type":"comment_create",}}
+    var xhrData = {"url": "/services/v5/aggregateor", "data": commandData}
+    var result = "not called"
+    var handlerFunction = function() {result = "called"}
+    var xhrListener = createXhrListenerFor("commands", "story_update", handlerFunction)
 
     xhrListener(null, null, xhrData)
 
@@ -163,10 +186,11 @@ describe("createXhrListenerFor", function() {
   })
 
   test("executes action when relevant", function() {
-    var xhrData = {"url": "/services/v5/commands?envelope=true", "data": null}
+  	var commandData = {"command":{"type":"story_update",}}
+    var xhrData = {"url": "/services/v5/commands?envelope=true", "data": commandData}
     var result = "not called"
     var handlerFunction = function() {result = "called"}
-    var xhrListener = createXhrListenerFor("commands", handlerFunction)
+    var xhrListener = createXhrListenerFor("commands", "story_update", handlerFunction)
 
     xhrListener(null, null, xhrData)
 

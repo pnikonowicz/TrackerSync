@@ -98,7 +98,7 @@ describe("getRestfulActionFromUrl", function() {
 
 describe("createXhrListenerFor", function() {
   test("ignores non relevant actions", function() {
-    var xhrData = {"url": "/services/v5/aggregateor"}
+    var xhrData = { data: '{"url": "/services/v5/aggregateor"}' }
     var result = "not called"
     var handlerFunction = function() {result = "called"}
     var xhrListener = createXhrListenerFor("commands", "story_update", handlerFunction)
@@ -109,7 +109,7 @@ describe("createXhrListenerFor", function() {
   })
 
   test("ignores non relevant command types", function() {
-    var commandData = {"command":{"type":"comment_create",}}
+    var commandData = '{"command":{"type":"comment_create"}}'
     var xhrData = {"url": "/services/v5/aggregateor", "data": commandData}
     var result = "not called"
     var handlerFunction = function() {result = "called"}
@@ -121,7 +121,7 @@ describe("createXhrListenerFor", function() {
   })
 
   test("executes action when relevant", function() {
-    var commandData = {"command":{"type":"story_update",}}
+    var commandData = '{"command":{"type":"story_update"}}'
     var xhrData = {"url": "/services/v5/commands?envelope=true", "data": commandData}
     var result = "not called"
     var handlerFunction = function() {result = "called"}
@@ -136,6 +136,13 @@ describe("createXhrListenerFor", function() {
 describe("doesDescriptionLinkToAnotherStory", function() {
   test("return true if the description only contains a link", function() {
     var description = "https://www.pivotaltracker.com/story/show/123"
+    var result = doesDescriptionLinkToAnotherStory(description)
+
+    return assertTrue(result)
+  })
+
+  test("return true if the description contains an id", function() {
+    var description = "#123"
     var result = doesDescriptionLinkToAnotherStory(description)
 
     return assertTrue(result)
@@ -197,8 +204,15 @@ describe("createSetOwnerData", function() {
 })
 
 describe("getDescriptionLinkStoryId", function() {
-  test("works perfectly", function() {
+  test("with link", function() {
     var description = "https://www.pivotaltracker.com/story/show/134"
+
+    var result = getDescriptionLinkStoryId(description)
+
+    return assertEqual("134", result)
+  })
+  test("with id", function() {
+    var description = "#134"
 
     var result = getDescriptionLinkStoryId(description)
 

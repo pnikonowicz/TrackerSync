@@ -20,6 +20,20 @@ function syncOwner(data) {
   })
 }
 
+function createXhrListenerFor(targetRestfulActionString, targetCommandTypeString, handlerFunction) {
+  return function(a,b,data) {
+    var innerData = JSON.parse(data.data)
+    var url = data.url
+    var action = getRestfulActionFromUrl(url)
+    var commandType = getCommandType(innerData)
+    if(action === targetRestfulActionString && commandType == targetCommandTypeString) {
+      handlerFunction(innerData)
+    }	else {
+      console.log("ignoring:", "commandType", commandType, "action", action, url, innerData)
+    }
+  }
+}
+
 function getDescriptionLinkStoryId(descriptionLink) {
   return descriptionLink.replace("https://www.pivotaltracker.com/story/show/", "").replace('#', '').trim()
 }
@@ -95,16 +109,3 @@ function getCommandType(data) {
   return data.command.type
 }
 
-function createXhrListenerFor(targetRestfulActionString, targetCommandTypeString, handlerFunction) {
-  return function(a,b,data) {
-    var innerData = JSON.parse(data.data)
-    var url = data.url
-    var action = getRestfulActionFromUrl(url)
-    var commandType = getCommandType(innerData)
-    if(action === targetRestfulActionString && commandType == targetCommandTypeString) {
-      handlerFunction(innerData)
-    }	else {
-      console.log("ignoring:", "commandType", commandType, "action", action, url, innerData)
-    }
-  }
-}

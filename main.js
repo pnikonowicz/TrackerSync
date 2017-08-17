@@ -29,7 +29,7 @@ function createExecuteIfLinkedStory(func) {
 function sync(story_data, description_data) {
   var description = getDescription(description_data)
   var descriptionLinkStoryId = getDescriptionLinkStoryId(description)
-  var setOwnerData = getSetOwnerData(story_data)
+  var setOwnerData = getStoryParameters(story_data)
 
   console.log("setting owner with:", descriptionLinkStoryId, setOwnerData)
 
@@ -56,8 +56,8 @@ function getDescriptionLinkStoryId(descriptionLink) {
   return descriptionLink.replace("https://www.pivotaltracker.com/story/show/", "").replace('#', '').trim()
 }
 
-function getSetOwnerData(data) {
-  return data.command.parameters
+function getStoryParameters(story_data) {
+  return story_data.command.parameters
 }
 
 function xhrSetOwner(storyId, data, callback) {

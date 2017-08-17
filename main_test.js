@@ -193,11 +193,11 @@ describe("getCommandType", function() {
   })
 })
 
-describe("getSetOwnerData", function() {
+describe("getStoryParameters", function() {
   test("grabs the data", function() {
     var data = {"person_id":2854507,"project":{"id":2025095,"version":2685},"command":{"type":"story_update","command_uuid":"acf13aa0-9b61-45df-a788-52d4a1ca3c01","parameters":{"owner_ids":[2179671,2854507],"id":150219631}}}
 
-    var result = getSetOwnerData(data)
+    var result = getStoryParameters(data)
     var expected = {"owner_ids":[2179671,2854507],"id":150219631}
     return assertEqual(JSON.stringify(expected), JSON.stringify(result))
   })

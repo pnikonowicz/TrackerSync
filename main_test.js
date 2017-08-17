@@ -96,12 +96,12 @@ describe("getRestfulActionFromUrl", function() {
   })
 })
 
-describe("createXhrListenerFor", function() {
+describe("createExecuteIfMatchingCommand(", function() {
   test("ignores non relevant actions", function() {
     var xhrData = { data: '{"url": "/services/v5/aggregateor"}' }
     var result = "not called"
     var handlerFunction = function() {result = "called"}
-    var xhrListener = createXhrListenerFor("commands", "story_update", handlerFunction)
+    var xhrListener = createExecuteIfMatchingCommand("commands", "story_update", handlerFunction)
 
     xhrListener(null, null, xhrData)
 
@@ -113,7 +113,7 @@ describe("createXhrListenerFor", function() {
     var xhrData = {"url": "/services/v5/aggregateor", "data": commandData}
     var result = "not called"
     var handlerFunction = function() {result = "called"}
-    var xhrListener = createXhrListenerFor("commands", "story_update", handlerFunction)
+    var xhrListener = createExecuteIfMatchingCommand("commands", "story_update", handlerFunction)
 
     xhrListener(null, null, xhrData)
 
@@ -125,7 +125,7 @@ describe("createXhrListenerFor", function() {
     var xhrData = {"url": "/services/v5/commands?envelope=true", "data": commandData}
     var result = "not called"
     var handlerFunction = function() {result = "called"}
-    var xhrListener = createXhrListenerFor("commands", "story_update", handlerFunction)
+    var xhrListener = createExecuteIfMatchingCommand("commands", "story_update", handlerFunction)
 
     xhrListener(null, null, xhrData)
 
@@ -193,11 +193,11 @@ describe("getCommandType", function() {
   })
 })
 
-describe("createSetOwnerData", function() {
+describe("getSetOwnerData", function() {
   test("grabs the data", function() {
     var data = {"person_id":2854507,"project":{"id":2025095,"version":2685},"command":{"type":"story_update","command_uuid":"acf13aa0-9b61-45df-a788-52d4a1ca3c01","parameters":{"owner_ids":[2179671,2854507],"id":150219631}}}
 
-    var result = createSetOwnerData(data)
+    var result = getSetOwnerData(data)
     var expected = {"owner_ids":[2179671,2854507],"id":150219631}
     return assertEqual(JSON.stringify(expected), JSON.stringify(result))
   })

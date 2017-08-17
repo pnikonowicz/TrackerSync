@@ -1,26 +1,44 @@
 function main() {
-  var listener = createXhrListenerFor('commands', 'story_update', syncOwner)
+  var executeIfLinkedStory = createExecuteIfLinkedStory(sync)
+  var xhrGetDescription = createXhrGetDescription(executeIfLinkedStory)
+  var listener = createExecuteIfMatchingCommand('commands', 'story_update', xhrGetDescription)
 
   $(document).ajaxComplete(listener)
 }
 
-function syncOwner(data) {
-  xhrGetDescription(data, function(description_data) {
+function createXhrGetDescription(func) {
+  return function(story_data) {
+    xhrGetDescription(story_data, function(description_data) {
+      func(story_data, description_data)
+    })
+  }
+}
+
+function createExecuteIfLinkedStory(func) {
+  return function(story_data, description_data) {
     var description = getDescription(description_data)
     if(doesDescriptionLinkToAnotherStory(description)) {
-      var descriptionLinkStoryId = getDescriptionLinkStoryId(description)
-      var setOwnerData = createSetOwnerData(data)
-      console.log("setting owner with:", descriptionLinkStoryId, setOwnerData)
-      xhrSetOwner(descriptionLinkStoryId, setOwnerData, function(data) {
-	console.log("owner updated:", data)
-      })
-    } else {
+      func(story_data, description_data)
+    }
+    else {
       console.log("description is not correct", description, descriptionLinkStoryId, description_data)
     }
+  }
+}
+
+function sync(story_data, description_data) {
+  var description = getDescription(description_data)
+  var descriptionLinkStoryId = getDescriptionLinkStoryId(description)
+  var setOwnerData = getSetOwnerData(story_data)
+
+  console.log("setting owner with:", descriptionLinkStoryId, setOwnerData)
+
+  xhrSetOwner(descriptionLinkStoryId, setOwnerData, function(data) {
+    console.log("owner updated:", data)
   })
 }
 
-function createXhrListenerFor(targetRestfulActionString, targetCommandTypeString, handlerFunction) {
+function createExecuteIfMatchingCommand(targetRestfulActionString, targetCommandTypeString, handlerFunction) {
   return function(a,b,data) {
     var innerData = JSON.parse(data.data)
     var url = data.url
@@ -38,7 +56,7 @@ function getDescriptionLinkStoryId(descriptionLink) {
   return descriptionLink.replace("https://www.pivotaltracker.com/story/show/", "").replace('#', '').trim()
 }
 
-function createSetOwnerData(data) {
+function getSetOwnerData(data) {
   return data.command.parameters
 }
 

@@ -10,6 +10,7 @@ function syncOwner(data) {
     if(doesDescriptionLinkToAnotherStory(description)) {
       var descriptionLinkStoryId = getDescriptionLinkStoryId(description)
       var setOwnerData = createSetOwnerData(data)
+      console.log("setting owner with:", descriptionLinkStoryId, setOwnerData)
       xhrSetOwner(descriptionLinkStoryId, setOwnerData, function(data) {
 	console.log("owner updated:", data)
       })
@@ -20,7 +21,7 @@ function syncOwner(data) {
 }
 
 function getDescriptionLinkStoryId(descriptionLink) {
-  return descriptionLink.replace("https://www.pivotaltracker.com/story/show/", "").trim()
+  return descriptionLink.replace("https://www.pivotaltracker.com/story/show/", "").replace('#', '').trim()
 }
 
 function createSetOwnerData(data) {
@@ -69,8 +70,10 @@ function getSourceProjectId() {
 
 function doesDescriptionLinkToAnotherStory(description) {
   var trimmed = description.trim()
-  var regex = /#\d+/
-  return description.match(regex) != null
+  lastPostSlash = description.split('/')
+  var regex = /\d+/
+  lastElement = lastPostSlash[lastPostSlash.length-1]
+  return lastElement.match(regex) != null
 }
 
 function getRestfulActionFromUrl(url) {

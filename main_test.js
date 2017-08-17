@@ -107,6 +107,18 @@ describe("createExecuteIfMatchingCommand(", function() {
 
     return assertEqual("not called", result)
   })
+  
+  test("ignores bad data", function() {
+    var xhrData = {"url": "/services/v5/commands"}
+    var result = "not called"
+
+    var handlerFunction = function() {result = "called"}
+    var xhrListener = createExecuteIfMatchingCommand("commands", "story_update", handlerFunction)
+
+    xhrListener(null, null, xhrData)
+
+    return assertEqual("not called", result)
+  })
 
   test("ignores non relevant command types", function() {
     var commandData = '{"command":{"type":"comment_create"}}'

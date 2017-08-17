@@ -40,6 +40,10 @@ function sync(story_data, description_data) {
 
 function createExecuteIfMatchingCommand(targetRestfulActionString, targetCommandTypeString, handlerFunction) {
   return function(a,b,data) {
+    if(data.data == null) {
+      console.log("not correct data type", data)
+      return
+    }
     var innerData = JSON.parse(data.data)
     var url = data.url
     var action = getRestfulActionFromUrl(url)

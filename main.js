@@ -1,5 +1,5 @@
 function main() {
-  var executeIfLinkedStory = createExecuteIfLinkedStory(sync)
+  var executeIfLinkedStory = createExecuteIfLinkedStory(syncStory)
   var xhrGetDescription = createXhrGetDescription(executeIfLinkedStory)
   var listener = createExecuteIfMatchingCommand('commands', 'story_update', xhrGetDescription)
 
@@ -26,7 +26,7 @@ function createExecuteIfLinkedStory(func) {
   }
 }
 
-function sync(story_data, description_data) {
+function syncStory(story_data, description_data) {
   var description = getDescription(description_data)
   var descriptionLinkStoryId = getDescriptionLinkStoryId(description)
   var setOwnerData = getStoryParameters(story_data)

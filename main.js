@@ -1,4 +1,5 @@
 function main() {
+  var syncStory = createSyncFunction(getStoryUrl)
   var executeIfLinkedStory = createExecuteIfLinkedStory(syncStory)
   var xhrGetDescription = createXhrGetDescription(executeIfLinkedStory)
   var listener = createExecuteIfMatchingCommand('commands', 'story_update', xhrGetDescription)
@@ -18,7 +19,7 @@ function createExecuteIfLinkedStory(func) {
   return function(story_data, description_data) {
     var description = getDescription(description_data)
     if(doesDescriptionLinkToAnotherStory(description)) {
-      func(story_data, description_data)
+      func(story_data, description)
     }
     else {
       console.log("description is not correct", description, description_data)
@@ -26,16 +27,19 @@ function createExecuteIfLinkedStory(func) {
   }
 }
 
-function syncStory(story_data, description_data) {
-  var description = getDescription(description_data)
-  var descriptionLinkStoryId = getDescriptionLinkStoryId(description)
-  var setOwnerData = getStoryParameters(story_data)
+function createSyncFunction(getUrlFunc) {
+  return function(story_data, description) {
+    var storyId = getDescriptionLinkStoryId(description)
+    var setOwnerData = getStoryParameters(story_data)
+    var projectId = getTargetProjectId()
+    var url = getUrlFunc(projectId, storyId)
 
-  console.log("setting owner with:", descriptionLinkStoryId, setOwnerData)
+    console.log("sync with:", url, setOwnerData)
 
-  xhrSetOwner(descriptionLinkStoryId, setOwnerData, function(data) {
-    console.log("owner updated:", data)
-  })
+    xhrSetOwner(url, setOwnerData, function(data) {
+      console.log("owner updated:", data)
+    })
+  }
 }
 
 function createExecuteIfMatchingCommand(targetRestfulActionString, targetCommandTypeString, handlerFunction) {
@@ -64,9 +68,7 @@ function getStoryParameters(story_data) {
   return story_data.command.parameters
 }
 
-function xhrSetOwner(storyId, data, callback) {
-  var projectId = getTargetProjectId()
-  var url = getStoryUrl(projectId, storyId)
+function xhrSetOwner(url, data, callback) {
   $.ajax({
     type:"PUT",
     url:url,

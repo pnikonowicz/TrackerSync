@@ -1,15 +1,38 @@
 function main() {
-  var syncStory = createSyncFunction(getStoryUrl)
-  var executeIfLinkedStory = createExecuteIfLinkedStory(syncStory)
-  var xhrGetDescription = createXhrGetDescription(executeIfLinkedStory)
-  var listener = createExecuteIfMatchingCommand('commands', 'story_update', xhrGetDescription)
-
-  $(document).ajaxComplete(listener)
+  var task_create_listener = createCommandListener("POST", getStoryIdFromTaskData, getTaskCreateUrl, 'task_create')
+  var story_update_listener = createCommandListener("PUT", getStoryIdFromStoryData, getStoryUrl, 'story_update')
+  var listeners = aggregateListeners(task_create_listener, story_update_listener)
+  $(document).ajaxComplete(listeners)
 }
 
-function createXhrGetDescription(func) {
+function aggregateListeners() {
+  var outterArgs = arguments
+  return function() {
+    for(var i=0; i<outterArgs.length; i++) {
+      outterArgs[i].apply(this, arguments)
+    }
+  }
+}
+
+function getTaskCreateUrl(projectId, storyId) {
+  return '/services/v5/projects/'+ projectId + '/stories/' + storyId + '/tasks'
+}
+
+function getStoryIdFromTaskData(task_data) {
+  return task_data.command.parameters.story_id
+}
+
+function createCommandListener(http_method, getStoryId, urlFunc, actionString) {
+  var syncStory = createSyncFunction(http_method,urlFunc)
+  var executeIfLinkedStory = createExecuteIfLinkedStory(syncStory)
+  var xhrGetDescription = createXhrGetDescription(getStoryId, executeIfLinkedStory)
+  var listener = createExecuteIfMatchingCommand('commands', actionString, xhrGetDescription)
+  return listener
+}
+
+function createXhrGetDescription(getStoryId, func) {
   return function(story_data) {
-    xhrGetDescription(story_data, function(description_data) {
+    xhrGetDescription(getStoryId, story_data, function(description_data) {
       func(story_data, description_data)
     })
   }
@@ -27,7 +50,7 @@ function createExecuteIfLinkedStory(func) {
   }
 }
 
-function createSyncFunction(getUrlFunc) {
+function createSyncFunction(http_method, getUrlFunc) {
   return function(story_data, description) {
     var storyId = getDescriptionLinkStoryId(description)
     var setOwnerData = getStoryParameters(story_data)
@@ -36,7 +59,7 @@ function createSyncFunction(getUrlFunc) {
 
     console.log("sync with:", url, setOwnerData)
 
-    xhrSetOwner(url, setOwnerData, function(data) {
+    xhrSetOwner(http_method, url, setOwnerData, function(data) {
       console.log("owner updated:", data)
     })
   }
@@ -68,9 +91,9 @@ function getStoryParameters(story_data) {
   return story_data.command.parameters
 }
 
-function xhrSetOwner(url, data, callback) {
+function xhrSetOwner(http_method, url, data, callback) {
   $.ajax({
-    type:"PUT",
+    type:http_method,
     url:url,
     data: JSON.stringify(data),
     contentType:"application/json; charset=utf-8",
@@ -87,11 +110,16 @@ function getStoryUrl(projectId, storyId) {
   return '/services/v5/projects/'+ projectId + '/stories/' + storyId
 }
 
-function xhrGetDescription(data, asyncFunction) {
+function getStoryIdFromStoryData(story_data) {
+  return story_data.command.parameters.id
+}
+
+function xhrGetDescription(getStoryId, data, asyncFunction) {
   var projectId = getSourceProjectId()
-  var storyId = data.command.parameters.id
+  var storyId = getStoryId(data)
   var url = getStoryUrl(projectId, storyId)
 
+  console.log("getDescription", url, data)
   jQuery.get(url, function(a,b,c) {
     console.log("xhrGetDescriptionSuccess", a,b,c)
     asyncFunction(a)

@@ -239,5 +239,33 @@ describe("getDescriptionLinkStoryId", function() {
   })
 })
 
+describe("aggregateListeners", function() {
+  test("they are called", function() {
+    var a = "a not called"
+    var b = "b not called"
+    var listenerA = function() { a = "a was called" }
+    var listenerB = function() { b = "b was called" }
+    var listeners = aggregateListeners(listenerA, listenerB)
 
+    listeners()
+
+    return assertEqual("a was called", a)
+         + assertEqual("b was called", b)
+  })
+
+  test("arguments are passed in", function() {
+    var aA,bA='a not set'
+    var aB,bB='b not set'
+    var listenerA = function(a, b) { aA = a; bA = b; }
+    var listenerB = function(a, b) { aB = a; bB = b; }
+    var listeners = aggregateListeners(listenerA, listenerB)
+
+    listeners('a set', 'b set')
+
+    return assertEqual("a set", aA)
+         + assertEqual("b set", bA)
+         + assertEqual("a set", aB)
+         + assertEqual("b set", bB)
+  })
+})
 

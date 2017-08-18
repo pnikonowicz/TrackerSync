@@ -21,7 +21,7 @@ function createExecuteIfLinkedStory(func) {
       func(story_data, description_data)
     }
     else {
-      console.log("description is not correct", description, descriptionLinkStoryId, description_data)
+      console.log("description is not correct", description, description_data)
     }
   }
 }

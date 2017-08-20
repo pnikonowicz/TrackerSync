@@ -49,10 +49,6 @@ function assertIsNotNull(x) {
     return pass()
 }
 
-function getStoryUrl(projectId, storyId) {
-  return '/services/v5/projects/'+ projectId + '/stories/' + storyId
-}
-
 function assertEqual(a,b) {
   var html = "assertEqual - FAIL"
   if(a==b)

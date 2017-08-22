@@ -13,6 +13,7 @@
     {
       "matches": ["https://www.pivotaltracker.com/*"],
       "js": [ "main.js", "run.js"],
+      "css": ["styles.css"],
       "run_at": "document_end"
     }
   ],

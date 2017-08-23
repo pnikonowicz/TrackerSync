@@ -1,7 +1,9 @@
 function main() {
-  var task_create_listener = createCommandListener("POST", getStoryIdFromTaskData, getTaskCreateUrl, 'task_create')
   var story_update_listener = createCommandListener("PUT", getStoryIdFromStoryData, getStoryUrl, 'story_update')
-  var listeners = aggregateListeners(task_create_listener, story_update_listener)
+
+  var listeners = aggregateListeners(
+    story_update_listener
+  )
   $(document).ajaxComplete(listeners)
 }
 
@@ -76,6 +78,7 @@ function createExecuteIfMatchingCommand(targetRestfulActionString, targetCommand
     var action = getRestfulActionFromUrl(url)
     var commandType = getCommandType(innerData)
     if(action === targetRestfulActionString && commandType == targetCommandTypeString) {
+      console.log("matches:", commandType, innerData)
       handlerFunction(innerData)
     }	else {
       console.log("ignoring:", "commandType", commandType, "action", action, url, innerData)

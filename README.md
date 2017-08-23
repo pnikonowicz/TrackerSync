@@ -2,7 +2,7 @@
 
 This allows two columns to be in sync. After installing, configure the columns to sync by entering in their respective project ids in the plugin drop down from your chrome browser. 
 
-Note: this currently only sync's story data. Tasks, and blockers will not sync automatically. 
+Note: this currently only sync's story data. Tasks, comments, blockers, etc will not sync automatically. 
 
 ## To get the project ids for the source and destination fields:
 

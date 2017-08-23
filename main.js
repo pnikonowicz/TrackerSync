@@ -1,9 +1,13 @@
-function main() {
-  var story_update_listener = createCommandListener("PUT", getStoryIdFromStoryData, getStoryUrl, 'story_update')
-
+function main(modelJson) {
+  console.log('model', modelJson)
+  var model = JSON.parse(modelJson).TrackerSyncModel
+  var sourceProjectId = model.ReferenceProjectId
+  var destinationProjectId = model.TargetProjectId
+  var story_update_listener = createCommandListener(sourceProjectId, destinationProjectId, "PUT", getStoryIdFromStoryData, getStoryUrl, 'story_update')
   var listeners = aggregateListeners(
     story_update_listener
   )
+
   $(document).ajaxComplete(listeners)
 }
 
@@ -24,17 +28,17 @@ function getStoryIdFromTaskData(task_data) {
   return task_data.command.parameters.story_id
 }
 
-function createCommandListener(http_method, getStoryId, urlFunc, actionString) {
-  var syncStory = createSyncFunction(http_method,urlFunc)
+function createCommandListener(sourceProjectId, destinationProjectId, http_method, getStoryId, urlFunc, actionString) {
+  var syncStory = createSyncFunction(destinationProjectId, http_method,urlFunc)
   var executeIfLinkedStory = createExecuteIfLinkedStory(syncStory)
-  var xhrGetDescription = createXhrGetDescription(getStoryId, executeIfLinkedStory)
+  var xhrGetDescription = createXhrGetDescription(sourceProjectId, getStoryId, executeIfLinkedStory)
   var listener = createExecuteIfMatchingCommand('commands', actionString, xhrGetDescription)
   return listener
 }
 
-function createXhrGetDescription(getStoryId, func) {
+function createXhrGetDescription(sourceProjectId, getStoryId, func) {
   return function(story_data) {
-    xhrGetDescription(getStoryId, story_data, function(description_data) {
+    xhrGetDescription(sourceProjectId, getStoryId, story_data, function(description_data) {
       func(story_data, description_data)
     })
   }
@@ -52,12 +56,11 @@ function createExecuteIfLinkedStory(func) {
   }
 }
 
-function createSyncFunction(http_method, getUrlFunc) {
+function createSyncFunction(projectId, http_method, getUrlFunc) {
   return function(story_data, description) {
     var storyId = getDescriptionLinkStoryId(description)
     var setOwnerData = getStoryParameters(story_data)
-    var projectId = getTargetProjectId()
-    var url = getUrlFunc(projectId, storyId)
+    var url = getUrlFunc(projectId, storyId, story_data)
 
     console.log("sync with:", url, setOwnerData)
 
@@ -117,8 +120,7 @@ function getStoryIdFromStoryData(story_data) {
   return story_data.command.parameters.id
 }
 
-function xhrGetDescription(getStoryId, data, asyncFunction) {
-  var projectId = getSourceProjectId()
+function xhrGetDescription(projectId, getStoryId, data, asyncFunction) {
   var storyId = getStoryId(data)
   var url = getStoryUrl(projectId, storyId)
 
@@ -127,14 +129,6 @@ function xhrGetDescription(getStoryId, data, asyncFunction) {
     console.log("xhrGetDescriptionSuccess", a,b,c)
     asyncFunction(a)
   })
-}
-
-function getTargetProjectId() {
-  return "1479998"
-}
-
-function getSourceProjectId() {
-  return "2025095"
 }
 
 function doesDescriptionLinkToAnotherStory(description) {

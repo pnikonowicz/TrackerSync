@@ -1,8 +1,8 @@
 function main(modelJson) {
   console.log('model', modelJson)
   var model = JSON.parse(modelJson).TrackerSyncModel
-  var sourceProjectId = model.ReferenceProjectId
-  var destinationProjectId = model.TargetProjectId
+  var sourceProjectId = model.SourceProjectId
+  var destinationProjectId = model.DestinationProjectId
   var story_update_listener = createCommandListener(sourceProjectId, destinationProjectId, "PUT", getStoryIdFromStoryData, getStoryUrl, 'story_update')
   var listeners = aggregateListeners(
     story_update_listener

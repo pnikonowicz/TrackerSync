@@ -1,1 +1,9 @@
-#TrackerSync {height: 475px; width: 300px; margin: 5px;}
+#TrackerSync {
+  margin: 5px;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0
+}

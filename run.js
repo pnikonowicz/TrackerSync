@@ -1,4 +1,9 @@
 console.log("starting")
+
+function append(s) {
+  (document.head || document.documentElement).appendChild(s);
+}
+
 chrome.storage.sync.get("TrackerSyncModel", function(model) {
   var s = document.createElement('script');
   s.src = chrome.extension.getURL('main.js');
@@ -12,8 +17,12 @@ chrome.storage.sync.get("TrackerSyncModel", function(model) {
     s.onload = function() {
       console.log("loaded")
     };
-    (document.head || document.documentElement).appendChild(s);
+    append(s)
   };
-  (document.head || document.documentElement).appendChild(s);
+  append(s)
 })
 
+console.log('loading snippets')
+var s = document.createElement('div')
+s.innerHTML = chrome.extension.getURL('snippets.html')
+append(s)

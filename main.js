@@ -11,6 +11,14 @@ function main(modelJson) {
   $(document).ajaxComplete(listeners)
 }
 
+function prependToPanelBacklogDom(id, html) {
+  var xPath = '#panel_backlog_'+id+' a[title="Add Story"]'
+  var selection = $(xPath).parent()
+  var currentHtml = selection.html()
+
+  selection.html(html + currentHtml)
+}
+
 function aggregateListeners() {
   var outterArgs = arguments
   return function() {

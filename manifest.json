@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "TrackerSync",
-  "description": "This extension shows a syncs your public and private pivotaltracker columns",
+  "description": "This extension syncs a public and private pivotaltracker column",
   "version": "1.0",
 
   "browser_action": {

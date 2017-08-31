@@ -9,14 +9,17 @@ function main(modelJson) {
   )
 
   $(document).ajaxComplete(listeners)
+
+  prependToPanelBacklogDom()
 }
 
 function prependToPanelBacklogDom(id, html) {
+  var id = '1479998'
+  var html = $('#TrackerSync_CreateSyncStoryButton')
   var xPath = '#panel_backlog_'+id+' a[title="Add Story"]'
-  var selection = $(xPath).parent()
-  var currentHtml = selection.html()
+  var container = $(xPath).parent()
 
-  selection.html(html + currentHtml)
+  container.append(html)
 }
 
 function aggregateListeners() {

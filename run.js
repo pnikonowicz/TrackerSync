@@ -22,7 +22,18 @@ chrome.storage.sync.get("TrackerSyncModel", function(model) {
   append(s)
 })
 
-console.log('loading snippets')
-var s = document.createElement('div')
-s.innerHTML = chrome.extension.getURL('snippets.html')
-append(s)
+
+
+function reqListener () {
+  console.log('loading snippets')
+  var s = document.createElement('div')
+  s.innerHTML = this.responseText
+  append(s)
+  console.log("html:", s.innerHTML)
+}
+
+var oReq = new XMLHttpRequest();
+var url = chrome.extension.getURL('snippets.html')
+oReq.addEventListener("load", reqListener);
+oReq.open("GET", url);
+oReq.send();

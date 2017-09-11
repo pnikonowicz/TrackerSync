@@ -2,10 +2,10 @@
   margin: 5px;
 }
 
-body {
+body#TrackerSync {
   margin: 0;
 }
 
-html {
+html#TrackerSync {
   display: inline-table;
 }

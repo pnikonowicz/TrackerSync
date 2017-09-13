@@ -1,11 +1,11 @@
-#TrackerSync {
+.ThisIsTrackerSync section {
   margin: 5px;
 }
 
-body#TrackerSync {
+.ThisIsTrackerSync body{
   margin: 0;
 }
 
-html#TrackerSync {
+html.ThisIsTrackerSync {
   display: inline-table;
 }

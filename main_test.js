@@ -169,6 +169,11 @@ describe("doesDescriptionLinkToAnotherStory", function() {
 
     return assertFalse(result)
   })
+
+  test("return false if description is null", function() {
+    var result = doesDescriptionLinkToAnotherStory(null)
+    return assertFalse(result)
+  })
 })
 
 describe("getCommandType", function() {

@@ -144,6 +144,8 @@ function xhrGetDescription(projectId, getStoryId, data, asyncFunction) {
 }
 
 function doesDescriptionLinkToAnotherStory(description) {
+  if(!!!description) return false
+
   var trimmed = description.trim()
   lastPostSlash = description.split('/')
   var regex = /\d+/

@@ -265,3 +265,35 @@ describe("aggregateListeners", function() {
   })
 })
 
+describe("isTitleData", function() {
+  test("returns true if data contains title", function() {
+    var data = { name: "do not sync this", id : 151070443}
+    var result = isTitleData(data)
+
+    return assertTrue(result)
+  })
+
+  test("returns false otherwise", function() {
+    var data = { something_else: "do not sync this"}
+    var result = isTitleData(data)
+
+    return assertFalse(result)
+  })
+})
+
+describe("isDescriptionData", function() {
+  test("return true if data contains description", function() {
+    var data = { description : "do not sync this", id : 151070443}
+    var result = isDescriptionData(data)
+
+    return assertTrue(result)
+  })
+
+  test("returns false otherwise", function() {
+    var data = { something_else: "do not sync this"}
+    var result = isDescriptionData(data)
+
+    return assertFalse(result)
+  })
+})
+

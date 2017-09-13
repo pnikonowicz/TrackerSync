@@ -56,14 +56,26 @@ function createExecuteIfLinkedStory(func) {
   }
 }
 
+function isTitleData(data) {
+  return "name" in data
+}
+
+function isDescriptionData(data) {
+  return "description" in data
+}
+
 function createSyncFunction(projectId, http_method, getUrlFunc) {
   return function(story_data, description) {
     var storyId = getDescriptionLinkStoryId(description)
     var setOwnerData = getStoryParameters(story_data)
     var url = getUrlFunc(projectId, storyId, story_data)
 
-    console.log("sync with:", url, setOwnerData)
+    if(isTitleData(setOwnerData) || isDescriptionData(setOwnerData)) {
+      console.log("skipping sync for", story_data)
+      return
+    }
 
+    console.log("sync with:", url, setOwnerData)
     xhrSetOwner(http_method, url, setOwnerData, function(data) {
       console.log("owner updated:", data)
     })
